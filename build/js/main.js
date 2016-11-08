@@ -22,22 +22,7 @@
     creaturePool.push(createCreature(randomMom, randomDad));
 
     if (counter === total) {
-      creaturePool.forEach(function addCreatureToView(each) {
-        var randomTop = Math.floor((Math.random()*350)) + 50;
-        var randomLeft = Math.floor((Math.random()*650)) + 50;
-        console.log('randomTop: ', randomTop);
-        console.log('randomLeft: ', randomLeft);
-
-        var newCreature = $('<div>').addClass('creature').css({
-                                                            'width': each.size,
-                                                            'height': each.size,
-                                                            'position': 'absolute',
-                                                            'top': randomTop,
-                                                            'left': randomLeft,
-                                                            'background-color': randomColor()
-                                                          });
-        $('.ecosystem').append(newCreature);
-      });
+      drawCreatures(creaturePool);
     } else {
       counter ++;
       seedCreatures(total, counter);
@@ -65,15 +50,13 @@
     return randomColor;
   }
 
-  seedCreatures(10);
-
-
-  // Function to create a creature.
   function createCreature(mom, dad) {
-    var randomGender = Math.ceil(Math.random()*10000)+1;
+    var randomGender = Math.ceil(Math.random()*10)+1;
     var randomSpeed = Math.floor(Math.random()*11)-5;
     var randomSize = Math.floor(Math.random()*11)-5;
     var babyCreature = {};
+
+    babyCreature.ID = generateUIDNotMoreThan1million();
 
     if (randomGender % 2 === 0) {
       babyCreature.gender = 'female';
@@ -98,12 +81,54 @@
     return babyCreature;
   }
 
+  function drawCreatures(arrayOfCreatures) {
+    arrayOfCreatures.forEach(function addCreatureToView(each) {
+      var randomTop = Math.floor((Math.random()*350)) + 50;
+      var randomLeft = Math.floor((Math.random()*650)) + 50;
+      var newCreature = $('<div>').addClass('creature').attr('id', each.ID)
+        .css({
+          'width': each.size,
+          'height': each.size,
+          'position': 'absolute',
+          'top': randomTop,
+          'left': randomLeft,
+          'background-color': randomColor(),
+          'transition': 'transition: all 0.25s ease-out'
+        });
+      $('.ecosystem').append(newCreature);
+    });
+  }
+
+  function generateUIDNotMoreThan1million() {
+    return ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).slice(-4);
+  }
+
+  function moveCreature(creature) {
+    var creatureHTMLElement = $('#' + creature.ID);
+    var randomDirection = Math.floor(Math.random()*360);
+    var oldLeft = parseInt(creatureHTMLElement[0].style.left);
+    var oldTop = parseInt(creatureHTMLElement[0].style.top);
+    var leftChange = (creature.speed * Math.sin(randomDirection * Math.PI / 180));
+    var topChange = (creature.speed * Math.cos(randomDirection * Math.PI / 180));
+    
+    creatureHTMLElement.css({
+                          'left': oldLeft + leftChange,
+                          'top': oldTop + topChange
+                        });
+
+  }
+
+  seedCreatures(10);
+
   // Have them all move around and make decisions based on values I set.
 
-  // function loop() {
-  //
-  // }
+  function loop() {
+    creaturePool.forEach(function moveCreatures(each) {
+      moveCreature(each);
+    });
 
-  // var looper = setInterval(loop, 20);
+  }
+
+  // var looper = setInterval(loop, 200);
 
 })();

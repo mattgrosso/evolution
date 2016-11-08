@@ -5,10 +5,7 @@
 
   // Set up a random number of random creatures.
   function seedCreatures(total, counter) {
-    console.log('This is a flag');
-    console.log('counter: ', counter);
-    console.log('total: ', total);
-    
+
     counter = counter || 1;
 
     var randomMom = {
@@ -25,12 +22,47 @@
     creaturePool.push(createCreature(randomMom, randomDad));
 
     if (counter === total) {
-      return 'done';
+      creaturePool.forEach(function addCreatureToView(each) {
+        var randomTop = Math.floor((Math.random()*350)) + 50;
+        var randomLeft = Math.floor((Math.random()*650)) + 50;
+        console.log('randomTop: ', randomTop);
+        console.log('randomLeft: ', randomLeft);
+
+        var newCreature = $('<div>').addClass('creature').css({
+                                                            'width': each.size,
+                                                            'height': each.size,
+                                                            'position': 'absolute',
+                                                            'top': randomTop,
+                                                            'left': randomLeft,
+                                                            'background-color': randomColor()
+                                                          });
+        $('.ecosystem').append(newCreature);
+      });
     } else {
       counter ++;
       seedCreatures(total, counter);
     }
 
+  }
+
+  function randomColor() {
+    var randomColor = Math.floor((Math.random()*1000000));
+
+    if (randomColor < 10) {
+      randomColor = '#00000' + randomColor;
+    } else if (randomColor < 100) {
+      randomColor = '#0000' + randomColor;
+    } else if (randomColor < 1000) {
+      randomColor = '#000' + randomColor;
+    } else if (randomColor < 10000) {
+      randomColor = '#00' + randomColor;
+    } else if (randomColor < 100000) {
+      randomColor = '#0' + randomColor;
+    } else {
+      randomColor = '#' + randomColor;
+    }
+
+    return randomColor;
   }
 
   seedCreatures(10);

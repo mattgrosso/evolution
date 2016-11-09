@@ -110,7 +110,7 @@
     var oldTop = parseInt(creatureHTMLElement[0].style.top);
     var leftChange = (creature.speed * Math.sin(randomDirection * Math.PI / 180));
     var topChange = (creature.speed * Math.cos(randomDirection * Math.PI / 180));
-    
+
     creatureHTMLElement.css({
                           'left': oldLeft + leftChange,
                           'top': oldTop + topChange
@@ -118,7 +118,29 @@
 
   }
 
+  function creatureCollide() {
+    var topLeftQuadrant = creaturePool.filter(function topLeftQuadrant(each) {
+      return ($('#' + each.ID)[0].getBoundingClientRect().top < 250) && ($('#' + each.ID)[0].getBoundingClientRect().left < 375);
+    });
+    var topRightQuadrant = creaturePool.filter(function topRightQuadrant(each) {
+      return ($('#' + each.ID)[0].getBoundingClientRect().top < 250) && ($('#' + each.ID)[0].getBoundingClientRect().left > 375);
+    });
+    var bottomLeftQuadrant = creaturePool.filter(function bottomLeftQuadrant(each) {
+      return ($('#' + each.ID)[0].getBoundingClientRect().top > 250) && ($('#' + each.ID)[0].getBoundingClientRect().left > 375);
+    });
+    var bottomRightQuadrant = creaturePool.filter(function bottomRightQuadrant(each) {
+      return ($('#' + each.ID)[0].getBoundingClientRect().top > 250) && ($('#' + each.ID)[0].getBoundingClientRect().left > 375);
+    });
+
+    console.log(topLeftQuadrant);
+    console.log(topRightQuadrant);
+    console.log(bottomLeftQuadrant);
+    console.log(bottomRightQuadrant);
+  }
+
   seedCreatures(10);
+
+  creatureCollide($('#' + creaturePool[0].ID));
 
   // Have them all move around and make decisions based on values I set.
 

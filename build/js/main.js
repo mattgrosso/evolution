@@ -1,6 +1,7 @@
 (function() {
   'use strict';
 
+  var round = 0;
   var creaturePool = [];
 
   // Set up a random number of random creatures.
@@ -21,9 +22,7 @@
 
     createCreature(randomMom, randomDad);
 
-    if (counter === total) {
-      console.log(creaturePool);
-    } else {
+    if (counter < total) {
       counter ++;
       seedCreatures(total, counter);
     }
@@ -58,6 +57,11 @@
 
     babyCreature.ID = generateUIDNotMoreThan1million();
 
+    babyCreature.birthday = round;
+    babyCreature.age = function age() {
+      return round - babyCreature.birthday;
+    };
+
     if (randomSex % 2 === 0) {
       babyCreature.sex = 'female';
     } else {
@@ -81,8 +85,11 @@
     drawCreature(babyCreature);
 
     babyCreature.htmlElement = $('#' + babyCreature.ID)[0];
+    babyCreature.boundingRect = babyCreature.htmlElement.getBoundingClientRect();
 
     creaturePool.push(babyCreature);
+
+    return babyCreature;
 
   }
 
@@ -103,10 +110,15 @@
   }
 
   function killCreature(creature) {
-    console.log(creature);
     creature.dead = true;
-    console.log(creature.ID, " died");
-    $('#' + creature.ID).remove();
+    $('#' + creature.ID).hide();
+    removeFromPool(creature);
+    console.log(creature.ID, ' died');
+  }
+
+  function removeFromPool(creature) {
+    console.log('This is a flag');
+    creaturePool.splice(creaturePool.indexOf(creature), 1);
   }
 
   function generateUIDNotMoreThan1million() {
@@ -130,26 +142,53 @@
   function creatureCollide() {
     var topLeftQuadrant =
       creaturePool.filter(function topLeftQuadrant(each) {
-      return ($('#' + each.ID)[0].getBoundingClientRect().bottom < 250) && ($('#' + each.ID)[0].getBoundingClientRect().right < 375);
-    });
-    var topRightQuadrant = creaturePool.filter(function topRightQuadrant(each) {
-      return ($('#' + each.ID)[0].getBoundingClientRect().bottom < 250) && ($('#' + each.ID)[0].getBoundingClientRect().left > 375);
-    });
-    var bottomLeftQuadrant = creaturePool.filter(function bottomLeftQuadrant(each) {
-      return ($('#' + each.ID)[0].getBoundingClientRect().top > 250) && ($('#' + each.ID)[0].getBoundingClientRect().right > 375);
-    });
-    var bottomRightQuadrant = creaturePool.filter(function bottomRightQuadrant(each) {
-      return ($('#' + each.ID)[0].getBoundingClientRect().top > 250) && ($('#' + each.ID)[0].getBoundingClientRect().left > 375);
-    });
+        return ($('#' + each.ID)[0].getBoundingClientRect().bottom < 250) && ($('#' + each.ID)[0].getBoundingClientRect().right < 375);
+      });
+
+    var topRightQuadrant =
+      creaturePool.filter(function topRightQuadrant(each) {
+        return ($('#' + each.ID)[0].getBoundingClientRect().bottom < 250) && ($('#' + each.ID)[0].getBoundingClientRect().left > 375);
+      });
+
+    var bottomLeftQuadrant =
+      creaturePool.filter(function bottomLeftQuadrant(each) {
+        return ($('#' + each.ID)[0].getBoundingClientRect().top > 250) && ($('#' + each.ID)[0].getBoundingClientRect().right < 375);
+      });
+
+    var bottomRightQuadrant =
+      creaturePool.filter(function bottomRightQuadrant(each) {
+        return ($('#' + each.ID)[0].getBoundingClientRect().top > 250) && ($('#' + each.ID)[0].getBoundingClientRect().left > 375);
+      });
+
+    var borderAreas =
+      creaturePool.filter(function borderAreas(each) {
+        return (($('#' + each.ID)[0].getBoundingClientRect().bottom > 250 && $('#' + each.ID)[0].getBoundingClientRect().top < 250) ||
+                ($('#' + each.ID)[0].getBoundingClientRect().right > 350 && $('#' + each.ID)[0].getBoundingClientRect().left < 350)
+                );
+      });
+
+    var collisionList = {};
 
     topLeftQuadrant.forEach(function collide(each) {
+
       var eachRect = each.htmlElement.getBoundingClientRect();
+
       topLeftQuadrant.forEach(function (eacher) {
+
         var eacherRect = eacher.htmlElement.getBoundingClientRect();
+
         if (each.ID === eacher.ID) {
           return;
-        } else if (  (eachRect.right > eacherRect.left) && (eachRect.left < eacherRect.right) && (eachRect.bottom > eacherRect.top) && (eachRect.top < eacherRect.bottom)) {
-          creatureInteractions(each, eacher);
+        }
+        else if (  (eachRect.right > eacherRect.left) && (eachRect.left < eacherRect.right) && (eachRect.bottom > eacherRect.top) && (eachRect.top < eacherRect.bottom)) {
+
+          var collisionName = each.ID + eacher.ID;
+          var collisionNameInverse = eacher.ID + each.ID;
+
+          if (!collisionList[collisionName] && !collisionList[collisionNameInverse]) {
+            creatureInteractions(each, eacher);
+            collisionList[collisionName] = true;
+          }
         }
       });
     });
@@ -161,8 +200,13 @@
         if (each.ID === eacher.ID) {
           return;
         } else if (  (eachRect.right > eacherRect.left) && (eachRect.left < eacherRect.right) && (eachRect.bottom > eacherRect.top) && (eachRect.top < eacherRect.bottom)) {
-          creatureInteractions(each, eacher);
-        }
+          var collisionName = each.ID + eacher.ID;
+          var collisionNameInverse = eacher.ID + each.ID;
+
+          if (!collisionList[collisionName] && !collisionList[collisionNameInverse]) {
+            creatureInteractions(each, eacher);
+            collisionList[collisionName] = true;
+          }        }
       });
     });
 
@@ -173,8 +217,13 @@
         if (each.ID === eacher.ID) {
           return;
         } else if (  (eachRect.right > eacherRect.left) && (eachRect.left < eacherRect.right) && (eachRect.bottom > eacherRect.top) && (eachRect.top < eacherRect.bottom)) {
-          creatureInteractions(each, eacher);
-        }
+          var collisionName = each.ID + eacher.ID;
+          var collisionNameInverse = eacher.ID + each.ID;
+
+          if (!collisionList[collisionName] && !collisionList[collisionNameInverse]) {
+            creatureInteractions(each, eacher);
+            collisionList[collisionName] = true;
+          }        }
       });
     });
 
@@ -185,18 +234,38 @@
         if (each.ID === eacher.ID) {
           return;
         } else if (  (eachRect.right > eacherRect.left) && (eachRect.left < eacherRect.right) && (eachRect.bottom > eacherRect.top) && (eachRect.top < eacherRect.bottom)) {
-          creatureInteractions(each, eacher);
-        }
+          var collisionName = each.ID + eacher.ID;
+          var collisionNameInverse = eacher.ID + each.ID;
+
+          if (!collisionList[collisionName] && !collisionList[collisionNameInverse]) {
+            creatureInteractions(each, eacher);
+            collisionList[collisionName] = true;
+          }        }
+      });
+    });
+
+    borderAreas.forEach(function collide(each) {
+      var eachRect = each.htmlElement.getBoundingClientRect();
+      borderAreas.forEach(function (eacher) {
+        var eacherRect = eacher.htmlElement.getBoundingClientRect();
+        if (each.ID === eacher.ID) {
+          return;
+        } else if (  (eachRect.right > eacherRect.left) && (eachRect.left < eacherRect.right) && (eachRect.bottom > eacherRect.top) && (eachRect.top < eacherRect.bottom)) {
+          var collisionName = each.ID + eacher.ID;
+          var collisionNameInverse = eacher.ID + each.ID;
+
+          if (!collisionList[collisionName] && !collisionList[collisionNameInverse]) {
+            creatureInteractions(each, eacher);
+            collisionList[collisionName] = true;
+          }        }
       });
     });
 
   }
 
   function creatureInteractions(creature1, creature2) {
-    console.log(creature1.size, creature2.size);
     if (creature1.sex !== creature2.sex) {
-      var babyCreature = createCreature(creature1, creature2);
-      drawCreature(babyCreature);
+      createCreature(creature1, creature2);
     } else if (creature1.size > creature2.size) {
       killCreature(creature2);
     } else if (creature2.size >= creature1.size) {
@@ -204,18 +273,36 @@
     }
   }
 
+  function oldAge(creature, deathAge) {
+    if (creature.age() > deathAge) {
+      killCreature(creature);
+    }
+  }
+
+  $('.step-button').on('click', function () {
+    loop();
+  });
+
   seedCreatures(20);
 
-  // Have them all move around and make decisions based on values I set.
-
-  // function loop() {
-  //   creaturePool.forEach(function moveCreatures(each) {
-  //     moveCreature(each);
-  //   });
-  //
-  //   creatureCollide();
-  // }
-  //
-  // setInterval(loop, 200);
+  function loop() {
+    creaturePool.forEach(function moveCreatures(each) {
+      moveCreature(each);
+    });
+    creatureCollide();
+    round++;
+    creaturePool.forEach(function (each) {
+      oldAge(each, 50);
+    });
+    if (creaturePool.length < 1) {
+      clearInterval(looper);
+    }
+    if (creaturePool.length > 200) {
+      clearInterval(looper);
+    }
+    console.log(round);
+  }
+  console.log(creaturePool);
+  var looper = setInterval(loop, 200);
 
 })();

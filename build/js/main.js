@@ -9,20 +9,20 @@
     counter = counter || 1;
 
     var randomMom = {
-      gender: 'female',
-      size: Math.floor(Math.random()*10)+1,
+      sex: 'female',
+      size: Math.floor(Math.random()*10)+20,
       speed: Math.floor(Math.random()*10)+1
     };
     var randomDad = {
-      gender: 'male',
-      size: Math.floor(Math.random()*10)+1,
+      sex: 'male',
+      size: Math.floor(Math.random()*10)+20,
       speed: Math.floor(Math.random()*10)+1
     };
 
-    creaturePool.push(createCreature(randomMom, randomDad));
+    createCreature(randomMom, randomDad);
 
     if (counter === total) {
-      drawCreatures(creaturePool);
+      console.log(creaturePool);
     } else {
       counter ++;
       seedCreatures(total, counter);
@@ -51,52 +51,62 @@
   }
 
   function createCreature(mom, dad) {
-    var randomGender = Math.ceil(Math.random()*10)+1;
+    var randomSex = Math.ceil(Math.random()*10)+1;
     var randomSpeed = Math.floor(Math.random()*11)-5;
     var randomSize = Math.floor(Math.random()*11)-5;
     var babyCreature = {};
 
     babyCreature.ID = generateUIDNotMoreThan1million();
 
-    if (randomGender % 2 === 0) {
-      babyCreature.gender = 'female';
+    if (randomSex % 2 === 0) {
+      babyCreature.sex = 'female';
     } else {
-      babyCreature.gender = 'male';
+      babyCreature.sex = 'male';
     }
 
     if (((mom.speed + dad.speed)/2 + randomSpeed) > 0) {
       babyCreature.speed = (mom.speed + dad.speed)/2 + randomSpeed;
     } else {
       babyCreature.stillBorn = true;
-      console.log(babyCreature);
+      babyCreature.speed = 0;
     }
 
     if (((mom.size + dad.size)/2 + randomSize) > 0) {
       babyCreature.size = (mom.size + dad.size)/2 + randomSize;
     } else {
       babyCreature.tooSmall = true;
-      console.log(babyCreature);
+      babyCreature.size = 0;
     }
 
-    return babyCreature;
+    drawCreature(babyCreature);
+
+    babyCreature.htmlElement = $('#' + babyCreature.ID)[0];
+
+    creaturePool.push(babyCreature);
+
   }
 
-  function drawCreatures(arrayOfCreatures) {
-    arrayOfCreatures.forEach(function addCreatureToView(each) {
-      var randomTop = Math.floor((Math.random()*350)) + 50;
-      var randomLeft = Math.floor((Math.random()*650)) + 50;
-      var newCreature = $('<div>').addClass('creature').attr('id', each.ID)
-        .css({
-          'width': each.size,
-          'height': each.size,
-          'position': 'absolute',
-          'top': randomTop,
-          'left': randomLeft,
-          'background-color': randomColor(),
-          'transition': 'transition: all 0.25s ease-out'
-        });
-      $('.ecosystem').append(newCreature);
-    });
+  function drawCreature(creature) {
+    var randomTop = Math.floor((Math.random()*350)) + 50;
+    var randomLeft = Math.floor((Math.random()*650)) + 50;
+    var newCreature = $('<div>').addClass('creature').attr('id', creature.ID)
+      .css({
+        'width': creature.size,
+        'height': creature.size,
+        'position': 'absolute',
+        'top': randomTop,
+        'left': randomLeft,
+        'background-color': randomColor(),
+        'transition': 'all 0.25s ease-out'
+      });
+    $('.ecosystem').append(newCreature);
+  }
+
+  function killCreature(creature) {
+    console.log(creature);
+    creature.dead = true;
+    console.log(creature.ID, " died");
+    $('#' + creature.ID).remove();
   }
 
   function generateUIDNotMoreThan1million() {
@@ -104,14 +114,13 @@
   }
 
   function moveCreature(creature) {
-    var creatureHTMLElement = $('#' + creature.ID);
     var randomDirection = Math.floor(Math.random()*360);
-    var oldLeft = parseInt(creatureHTMLElement[0].style.left);
-    var oldTop = parseInt(creatureHTMLElement[0].style.top);
+    var oldLeft = parseInt(creature.htmlElement.style.left);
+    var oldTop = parseInt(creature.htmlElement.style.top);
     var leftChange = (creature.speed * Math.sin(randomDirection * Math.PI / 180));
     var topChange = (creature.speed * Math.cos(randomDirection * Math.PI / 180));
 
-    creatureHTMLElement.css({
+    $('#' + creature.ID).css({
                           'left': oldLeft + leftChange,
                           'top': oldTop + topChange
                         });
@@ -119,38 +128,94 @@
   }
 
   function creatureCollide() {
-    var topLeftQuadrant = creaturePool.filter(function topLeftQuadrant(each) {
-      return ($('#' + each.ID)[0].getBoundingClientRect().top < 250) && ($('#' + each.ID)[0].getBoundingClientRect().left < 375);
+    var topLeftQuadrant =
+      creaturePool.filter(function topLeftQuadrant(each) {
+      return ($('#' + each.ID)[0].getBoundingClientRect().bottom < 250) && ($('#' + each.ID)[0].getBoundingClientRect().right < 375);
     });
     var topRightQuadrant = creaturePool.filter(function topRightQuadrant(each) {
-      return ($('#' + each.ID)[0].getBoundingClientRect().top < 250) && ($('#' + each.ID)[0].getBoundingClientRect().left > 375);
+      return ($('#' + each.ID)[0].getBoundingClientRect().bottom < 250) && ($('#' + each.ID)[0].getBoundingClientRect().left > 375);
     });
     var bottomLeftQuadrant = creaturePool.filter(function bottomLeftQuadrant(each) {
-      return ($('#' + each.ID)[0].getBoundingClientRect().top > 250) && ($('#' + each.ID)[0].getBoundingClientRect().left > 375);
+      return ($('#' + each.ID)[0].getBoundingClientRect().top > 250) && ($('#' + each.ID)[0].getBoundingClientRect().right > 375);
     });
     var bottomRightQuadrant = creaturePool.filter(function bottomRightQuadrant(each) {
       return ($('#' + each.ID)[0].getBoundingClientRect().top > 250) && ($('#' + each.ID)[0].getBoundingClientRect().left > 375);
     });
 
-    console.log(topLeftQuadrant);
-    console.log(topRightQuadrant);
-    console.log(bottomLeftQuadrant);
-    console.log(bottomRightQuadrant);
-  }
+    topLeftQuadrant.forEach(function collide(each) {
+      var eachRect = each.htmlElement.getBoundingClientRect();
+      topLeftQuadrant.forEach(function (eacher) {
+        var eacherRect = eacher.htmlElement.getBoundingClientRect();
+        if (each.ID === eacher.ID) {
+          return;
+        } else if (  (eachRect.right > eacherRect.left) && (eachRect.left < eacherRect.right) && (eachRect.bottom > eacherRect.top) && (eachRect.top < eacherRect.bottom)) {
+          creatureInteractions(each, eacher);
+        }
+      });
+    });
 
-  seedCreatures(10);
+    topRightQuadrant.forEach(function collide(each) {
+      var eachRect = each.htmlElement.getBoundingClientRect();
+      topRightQuadrant.forEach(function (eacher) {
+        var eacherRect = eacher.htmlElement.getBoundingClientRect();
+        if (each.ID === eacher.ID) {
+          return;
+        } else if (  (eachRect.right > eacherRect.left) && (eachRect.left < eacherRect.right) && (eachRect.bottom > eacherRect.top) && (eachRect.top < eacherRect.bottom)) {
+          creatureInteractions(each, eacher);
+        }
+      });
+    });
 
-  creatureCollide($('#' + creaturePool[0].ID));
+    bottomLeftQuadrant.forEach(function collide(each) {
+      var eachRect = each.htmlElement.getBoundingClientRect();
+      bottomLeftQuadrant.forEach(function (eacher) {
+        var eacherRect = eacher.htmlElement.getBoundingClientRect();
+        if (each.ID === eacher.ID) {
+          return;
+        } else if (  (eachRect.right > eacherRect.left) && (eachRect.left < eacherRect.right) && (eachRect.bottom > eacherRect.top) && (eachRect.top < eacherRect.bottom)) {
+          creatureInteractions(each, eacher);
+        }
+      });
+    });
 
-  // Have them all move around and make decisions based on values I set.
-
-  function loop() {
-    creaturePool.forEach(function moveCreatures(each) {
-      moveCreature(each);
+    bottomRightQuadrant.forEach(function collide(each) {
+      var eachRect = each.htmlElement.getBoundingClientRect();
+      bottomRightQuadrant.forEach(function (eacher) {
+        var eacherRect = eacher.htmlElement.getBoundingClientRect();
+        if (each.ID === eacher.ID) {
+          return;
+        } else if (  (eachRect.right > eacherRect.left) && (eachRect.left < eacherRect.right) && (eachRect.bottom > eacherRect.top) && (eachRect.top < eacherRect.bottom)) {
+          creatureInteractions(each, eacher);
+        }
+      });
     });
 
   }
 
-  // var looper = setInterval(loop, 200);
+  function creatureInteractions(creature1, creature2) {
+    console.log(creature1.size, creature2.size);
+    if (creature1.sex !== creature2.sex) {
+      var babyCreature = createCreature(creature1, creature2);
+      drawCreature(babyCreature);
+    } else if (creature1.size > creature2.size) {
+      killCreature(creature2);
+    } else if (creature2.size >= creature1.size) {
+      killCreature(creature1);
+    }
+  }
+
+  seedCreatures(20);
+
+  // Have them all move around and make decisions based on values I set.
+
+  // function loop() {
+  //   creaturePool.forEach(function moveCreatures(each) {
+  //     moveCreature(each);
+  //   });
+  //
+  //   creatureCollide();
+  // }
+  //
+  // setInterval(loop, 200);
 
 })();

@@ -12,12 +12,12 @@
     var randomMom = {
       sex: 'female',
       size: Math.floor(Math.random()*10)+20,
-      speed: Math.floor(Math.random()*10)+1
+      speed: Math.floor(Math.random()*10)+20
     };
     var randomDad = {
       sex: 'male',
       size: Math.floor(Math.random()*10)+20,
-      speed: Math.floor(Math.random()*10)+1
+      speed: Math.floor(Math.random()*10)+20
     };
 
     createCreature(randomMom, randomDad);
@@ -29,24 +29,12 @@
 
   }
 
-  function randomColor() {
-    var randomColor = Math.floor((Math.random()*1000000));
-
-    if (randomColor < 10) {
-      randomColor = '#00000' + randomColor;
-    } else if (randomColor < 100) {
-      randomColor = '#0000' + randomColor;
-    } else if (randomColor < 1000) {
-      randomColor = '#000' + randomColor;
-    } else if (randomColor < 10000) {
-      randomColor = '#00' + randomColor;
-    } else if (randomColor < 100000) {
-      randomColor = '#0' + randomColor;
+  function chooseColor(creature) {
+    if (creature.sex === 'female') {
+      return '#00B281';
     } else {
-      randomColor = '#' + randomColor;
+      return '#DE0017';
     }
-
-    return randomColor;
   }
 
   function createCreature(mom, dad) {
@@ -58,6 +46,9 @@
     babyCreature.ID = generateUIDNotMoreThan1million();
 
     babyCreature.birthday = round;
+
+    babyCreature.energy = Math.ceil(Math.random()*50);
+
     babyCreature.age = function age() {
       return round - babyCreature.birthday;
     };
@@ -88,7 +79,6 @@
     babyCreature.boundingRect = babyCreature.htmlElement.getBoundingClientRect();
 
     creaturePool.push(babyCreature);
-
     return babyCreature;
 
   }
@@ -103,8 +93,8 @@
         'position': 'absolute',
         'top': randomTop,
         'left': randomLeft,
-        'background-color': randomColor(),
-        'transition': 'all 0.25s ease-out'
+        'background-color': chooseColor(creature),
+        'transition': 'all 0.5s ease-out'
       });
     $('.ecosystem').append(newCreature);
   }
@@ -113,11 +103,9 @@
     creature.dead = true;
     $('#' + creature.ID).hide();
     removeFromPool(creature);
-    console.log(creature.ID, ' died');
   }
 
   function removeFromPool(creature) {
-    console.log('This is a flag');
     creaturePool.splice(creaturePool.indexOf(creature), 1);
   }
 
@@ -266,16 +254,23 @@
   function creatureInteractions(creature1, creature2) {
     if (creature1.sex !== creature2.sex) {
       createCreature(creature1, creature2);
+      console.log(creature1.ID, ' and ', creature2.ID, ' had a baby!');
     } else if (creature1.size > creature2.size) {
+      creature1.energy = creature1.energy + creature2.energy;
       killCreature(creature2);
+      console.log(creature1.ID, ' ate ', creature2.ID);
     } else if (creature2.size >= creature1.size) {
+      creature2.energy = creature2.energy + creature1.energy;
       killCreature(creature1);
+      console.log(creature2.ID, ' ate ', creature1.ID);
     }
   }
 
-  function oldAge(creature, deathAge) {
-    if (creature.age() > deathAge) {
+  function oldAge(creature) {
+    creature.energy = creature.energy - 1;
+    if (creature.energy < 1) {
       killCreature(creature);
+      console.log(creature.ID, ' died of old age at ', creature.age());
     }
   }
 
@@ -283,24 +278,33 @@
     loop();
   });
 
-  seedCreatures(20);
+  seedCreatures(10);
 
   function loop() {
+
     creaturePool.forEach(function moveCreatures(each) {
       moveCreature(each);
     });
+
+    console.log(creaturePool[0]);
+
     creatureCollide();
+
     round++;
+
     creaturePool.forEach(function (each) {
-      oldAge(each, 50);
+      oldAge(each);
     });
+
     if (creaturePool.length < 1) {
       clearInterval(looper);
+      console.log('Everyone is Dead. You made it ' + round + ' rounds.');
     }
+
     if (creaturePool.length > 200) {
       clearInterval(looper);
+      console.log('Overpopulation. You made it ' + round + ' rounds.');
     }
-    console.log(round);
   }
   console.log(creaturePool);
   var looper = setInterval(loop, 200);

@@ -10,6 +10,10 @@ body{
   border: 1px solid black;
 }
 
+.special{
+  background-color: blue !important;
+}
+
 /*.creature{
   background-color: black;
 }*/

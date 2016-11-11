@@ -11,12 +11,14 @@
     var randomMom = {
       sex: 'female',
       size: Math.floor(Math.random()*10)+20,
-      speed: Math.floor(Math.random()*10)+20
+      speed: Math.floor(Math.random()*10)+20,
+      sensors: Math.floor(Math.random()*200)+200
     };
     var randomDad = {
       sex: 'male',
       size: Math.floor(Math.random()*10)+20,
-      speed: Math.floor(Math.random()*10)+20
+      speed: Math.floor(Math.random()*10)+20,
+      sensors: Math.floor(Math.random()*200)+200
     };
 
     createCreature(randomMom, randomDad);
@@ -40,19 +42,20 @@
     var randomSex = Math.ceil(Math.random()*10)+1;
     var randomSpeed = Math.floor(Math.random()*11)-5;
     var randomSize = Math.floor(Math.random()*11)-5;
+    var randomSensors = Math.floor(Math.random()*200)-100;
     var babyCreature = {};
 
     babyCreature.ID = generateUIDNotMoreThan1million();
 
     babyCreature.birthday = round;
 
-    babyCreature.energy = Math.ceil(Math.random()*5000);
+    babyCreature.energy = Math.ceil(Math.random()*50);
 
     babyCreature.age = function age() {
       return round - babyCreature.birthday;
     };
 
-    babyCreature.sensors = Math.floor(Math.random()*1000)+1;
+    babyCreature.sensors = (mom.sensors + dad.sensors)/2 + randomSensors;
 
     if (randomSex % 2 === 0) {
       babyCreature.sex = 'female';
@@ -101,6 +104,25 @@
         'background-color': chooseColor(creature),
         'transition': 'all 0.5s ease-out'
       });
+    var newArrow = $('<div>').addClass('arrow')
+      .css({
+        'position': 'relative',
+        'bottom': '50px',
+        'left': '50%',
+        'width': '2px',
+        'height': '70px',
+        'background-color': 'black',
+        'transform-origin': 'bottom'
+      });
+    var text = $('<p>')
+      .css({
+        'position': 'relative',
+        'top': '-63px',
+        'left': '-3px'
+      });
+
+    newCreature.append(newArrow);
+    newCreature.append(text);
     $('.ecosystem').append(newCreature);
   }
 
@@ -122,8 +144,8 @@
     var direction = creature.direction;
     var oldLeft = parseInt(creature.htmlElement.style.left);
     var oldTop = parseInt(creature.htmlElement.style.top);
-    var leftChange = (creature.speed * Math.sin(direction * Math.PI / 180));
-    var topChange = (creature.speed * Math.cos(direction * Math.PI / 180));
+    var leftChange = (creature.speed * Math.sin(direction * Math.PI/180));
+    var topChange = (creature.speed * Math.cos(direction * Math.PI/180));
 
     $('#' + creature.ID).css({
                           'left': oldLeft + leftChange,
@@ -261,11 +283,9 @@
     });
 
     creature.direction = sensorChoice(creature, sensedCreatures);
-
-    if ((creature.ID === creaturePool[0].ID) && (sensedCreatures.length > 0)) {
-      console.log(creature.ID, ' sensed ', sensedCreatures[0].ID);
-      console.log(creature.direction);
-    }
+    $('#' + creature.ID + ' .arrow').css({
+      'transform': 'rotate(' + creature.direction + 'deg)'
+    });
 
   }
 
@@ -291,12 +311,16 @@
     });
 
     if (biggestLove.size > 0) {
+      $('#' + creature.ID + ' p').text('love' + Math.floor(creature.direction));
       return findAngleTowards(creature, biggestLove);
     } else if (biggestEnemy.size > 0) {
+      $('#' + creature.ID + ' p').text('fear');
       return findAngleTowards(creature, biggestEnemy);
     } else if (biggestFood.size > 0) {
+      $('#' + creature.ID + ' p').text('hunger');
       return findAngleTowards(creature, biggestFood);
     } else {
+      $('#' + creature.ID + ' p').text('wandering');
       return Math.floor(Math.random()*360);
     }
   }
@@ -322,14 +346,17 @@
     if (creature1.sex !== creature2.sex) {
       createCreature(creature1, creature2);
       console.log(creature1.ID, ' and ', creature2.ID, ' had a baby!');
+      console.log(creaturePool.length);
     } else if (creature1.size > creature2.size) {
       creature1.energy = creature1.energy + creature2.energy;
       killCreature(creature2);
       console.log(creature1.ID, ' ate ', creature2.ID);
+      console.log(creaturePool.length);
     } else if (creature2.size >= creature1.size) {
       creature2.energy = creature2.energy + creature1.energy;
       killCreature(creature1);
       console.log(creature2.ID, ' ate ', creature1.ID);
+      console.log(creaturePool.length);
     }
   }
 
@@ -338,6 +365,7 @@
     if (creature.energy < 1) {
       killCreature(creature);
       console.log(creature.ID, ' died of old age at ', creature.age());
+      console.log(creaturePool.length);
     }
   }
 
@@ -375,8 +403,6 @@
   });
 
   seedCreatures(2);
-
-  $('#' + creaturePool[0].ID).addClass('special');
 
   // var looper = setInterval(loop, 200);
 

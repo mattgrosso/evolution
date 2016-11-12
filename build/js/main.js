@@ -144,8 +144,9 @@
     var direction = creature.direction;
     var oldLeft = parseInt(creature.htmlElement.style.left);
     var oldTop = parseInt(creature.htmlElement.style.top);
-    var leftChange = (creature.speed * Math.sin(direction * Math.PI/180));
-    var topChange = (creature.speed * Math.cos(direction * Math.PI/180));
+    //This is all broken.
+    var leftChange = (creature.speed * Math.cos(direction + 180));
+    var topChange = (creature.speed * Math.sin(direction + 180));
 
     $('#' + creature.ID).css({
                           'left': oldLeft + leftChange,
@@ -330,7 +331,8 @@
     var targetRect = targetCreature.htmlElement.getBoundingClientRect();
     var creatureCenter = {
       top: (creatureRect.top + creatureRect.bottom)/2,
-      left: (creatureRect.left + creatureRect.right)/2
+      left: (creatureRect.left + creatureRect.right)/2,
+      speed: creature.speed
     };
     var targetCenter = {
       top: (targetRect.top + targetRect.bottom)/2,
@@ -338,7 +340,7 @@
     };
 
     var direction = ((Math.atan2((creatureCenter.left - targetCenter.left), (creatureCenter.top - targetCenter.top)))/(Math.PI/180))*-1;
-
+    console.log('creatureCenter: ', creatureCenter, 'targetCenter: ', targetCenter, 'direction: ', direction, 'creature speed: ', creatureCenter.speed);
     return direction;
   }
 
@@ -402,7 +404,7 @@
     loop();
   });
 
-  seedCreatures(2);
+  seedCreatures(15);
 
   // var looper = setInterval(loop, 200);
 

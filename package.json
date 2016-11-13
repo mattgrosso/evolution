@@ -10,5 +10,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Matt Grosso",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.10.2",
+    "harp": "^0.20.3",
+}
+
 }

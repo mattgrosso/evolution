@@ -1,10 +1,11 @@
 (function() {
   'use strict';
 
-  window.console.log = function () {};
-
   var round = 0;
   var creaturePool = [];
+  var seedNumber = 10;
+  var overPopulation = 200;
+  var looper;
 
   function seedCreatures(total, counter) {
 
@@ -143,19 +144,15 @@
   }
 
   function moveCreature(creature) {
-    console.log(creature.direction);
     var direction = creature.direction;
-    var oldLeft = parseInt(creature.htmlElement.style.left);
-    var oldTop = parseInt(creature.htmlElement.style.top);
-    //This is all broken.
+    var oldCenterLeft = parseInt(creature.htmlElement.style.left) + creature.size/2;
+    var oldCenterTop = parseInt(creature.htmlElement.style.top) + creature.size/2;
     var leftChange = (creature.speed * Math.sin(direction * Math.PI/180));
     var topChange = (creature.speed * Math.cos(direction * Math.PI/180)) * -1;
 
-    console.log(leftChange, topChange);
-
     $('#' + creature.ID).css({
-                          'left': oldLeft + leftChange,
-                          'top': oldTop + topChange
+                          'left': oldCenterLeft + leftChange,
+                          'top': oldCenterTop + topChange
                         });
 
   }
@@ -351,18 +348,12 @@
   function creatureInteractions(creature1, creature2) {
     if (creature1.sex !== creature2.sex) {
       createCreature(creature1, creature2);
-      console.log(creature1.ID, ' and ', creature2.ID, ' had a baby!');
-      console.log(creaturePool.length);
     } else if (creature1.size > creature2.size) {
       creature1.energy = creature1.energy + creature2.energy;
       killCreature(creature2);
-      console.log(creature1.ID, ' ate ', creature2.ID);
-      console.log(creaturePool.length);
     } else if (creature2.size >= creature1.size) {
       creature2.energy = creature2.energy + creature1.energy;
       killCreature(creature1);
-      console.log(creature2.ID, ' ate ', creature1.ID);
-      console.log(creaturePool.length);
     }
   }
 
@@ -370,10 +361,22 @@
     creature.energy = creature.energy - 1;
     if (creature.energy < 1) {
       killCreature(creature);
-      console.log(creature.ID, ' died of old age at ', creature.age());
-      console.log(creaturePool.length);
     }
   }
+
+  $('.inputsForm').on('submit', function runLoop(event) {
+    event.preventDefault();
+
+    $('.ecosystem').html('');
+    round = 0;
+    creaturePool = [];
+    console.log($('#seedNumber')[0].value);
+    seedNumber = $('#seedNumber')[0].value;
+    overPopulation = $('#maxPopulation')[0].value;
+
+    seedCreatures(seedNumber);
+    looper = setInterval(loop, 200);
+  });
 
   function loop() {
 
@@ -398,7 +401,7 @@
       console.log('Everyone is Dead. You made it ' + round + ' rounds.');
     }
 
-    if (creaturePool.length > 100) {
+    if (creaturePool.length > overPopulation) {
       clearInterval(looper);
       console.log('Overpopulation. You made it ' + round + ' rounds.');
     }
@@ -407,10 +410,5 @@
   $('.step-button').on('click', function () {
     loop();
   });
-
-  seedCreatures(10);
-
-  var looper = setInterval(loop, 200);
-
 
 })();

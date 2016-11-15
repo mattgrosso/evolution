@@ -1,6 +1,8 @@
 (function() {
   'use strict';
 
+  window.console.log = function () {};
+
   var round = 0;
   var creaturePool = [];
 
@@ -104,25 +106,25 @@
         'background-color': chooseColor(creature),
         'transition': 'all 0.5s ease-out'
       });
-    var newArrow = $('<div>').addClass('arrow')
-      .css({
-        'position': 'relative',
-        'bottom': '50px',
-        'left': '50%',
-        'width': '2px',
-        'height': '70px',
-        'background-color': 'black',
-        'transform-origin': 'bottom'
-      });
-    var text = $('<p>')
-      .css({
-        'position': 'relative',
-        'top': '-63px',
-        'left': '-3px'
-      });
-
-    newCreature.append(newArrow);
-    newCreature.append(text);
+    // var newArrow = $('<div>').addClass('arrow')
+    //   .css({
+    //     'position': 'relative',
+    //     'bottom': '50px',
+    //     'left': '50%',
+    //     'width': '2px',
+    //     'height': '70px',
+    //     'background-color': 'black',
+    //     'transform-origin': 'bottom'
+    //   });
+    // var text = $('<p>')
+    //   .css({
+    //     'position': 'relative',
+    //     'top': '-63px',
+    //     'left': '-3px'
+    //   });
+    //
+    // newCreature.append(newArrow);
+    // newCreature.append(text);
     $('.ecosystem').append(newCreature);
   }
 
@@ -141,12 +143,15 @@
   }
 
   function moveCreature(creature) {
+    console.log(creature.direction);
     var direction = creature.direction;
     var oldLeft = parseInt(creature.htmlElement.style.left);
     var oldTop = parseInt(creature.htmlElement.style.top);
     //This is all broken.
-    var leftChange = (creature.speed * Math.cos(direction + 180));
-    var topChange = (creature.speed * Math.sin(direction + 180));
+    var leftChange = (creature.speed * Math.sin(direction * Math.PI/180));
+    var topChange = (creature.speed * Math.cos(direction * Math.PI/180)) * -1;
+
+    console.log(leftChange, topChange);
 
     $('#' + creature.ID).css({
                           'left': oldLeft + leftChange,
@@ -340,7 +345,6 @@
     };
 
     var direction = ((Math.atan2((creatureCenter.left - targetCenter.left), (creatureCenter.top - targetCenter.top)))/(Math.PI/180))*-1;
-    console.log('creatureCenter: ', creatureCenter, 'targetCenter: ', targetCenter, 'direction: ', direction, 'creature speed: ', creatureCenter.speed);
     return direction;
   }
 
@@ -394,7 +398,7 @@
       console.log('Everyone is Dead. You made it ' + round + ' rounds.');
     }
 
-    if (creaturePool.length > 200) {
+    if (creaturePool.length > 100) {
       clearInterval(looper);
       console.log('Overpopulation. You made it ' + round + ' rounds.');
     }
@@ -404,9 +408,9 @@
     loop();
   });
 
-  seedCreatures(15);
+  seedCreatures(10);
 
-  // var looper = setInterval(loop, 200);
+  var looper = setInterval(loop, 200);
 
 
 })();

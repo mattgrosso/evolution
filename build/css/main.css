@@ -15,9 +15,10 @@ body{
 }
 
 .inputsForm{
+  box-sizing: border-box;
   margin: auto;
   padding: 15px 20px 15px 20px;
-  width: 450px;
+  width: 45%;
   background-color: #53C361;
   border: 3px solid black;
   float: left;
@@ -34,8 +35,9 @@ button{
 }
 
 .control-buttons{
+  width: 45%;
   float: left;
-  padding: 25px 50px;
+  padding: 2% 5%;
   clear: right;
 }
 

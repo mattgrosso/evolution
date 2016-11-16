@@ -87,7 +87,6 @@
     }
 
     babyCreature.htmlElement = $('#' + babyCreature.ID)[0];
-    babyCreature.boundingRect = babyCreature.htmlElement.getBoundingClientRect();
 
     creaturePool.push(babyCreature);
     return babyCreature;
@@ -152,30 +151,34 @@
     var topChange = (creature.speed * Math.cos(direction * Math.PI/180)) * -1;
 
     if (oldCenterLeft + leftChange > window.innerWidth - 50) {
+      console.log('too far right');
       $('#' + creature.ID)
         .css({
           'transition': 'none',
-          'left': oldCenterLeft + leftChange - window.innerWidth
+          'left': (oldCenterLeft - creature.size/2) + leftChange - window.innerWidth
         });
     }
     else {
+      console.log('normal left');
       $('#' + creature.ID)
         .css({
-          'left': oldCenterLeft + leftChange,
+          'left': (oldCenterLeft - creature.size/2) + leftChange,
         });
     }
 
     if (oldCenterTop + topChange > window.innerHeight - 100) {
+      console.log('too far down');
       $('#' + creature.ID)
         .css({
           'transition': 'none',
-          'top': oldCenterTop + topChange - window.innerHeight + 75
+          'top':( oldCenterTop - creature.size/2) + topChange - window.innerHeight + 75
         });
     }
     else {
+      console.log('normal top');
       $('#' + creature.ID)
         .css({
-          'top': oldCenterTop + topChange,
+          'top':( oldCenterTop - creature.size/2) + topChange,
         });
     }
 
@@ -336,7 +339,6 @@
         }
       }
     });
-
     if (biggestLove.size > 0) {
       return findAngleTowards(creature, biggestLove);
     } else if (biggestEnemy.size > 0) {
@@ -398,21 +400,23 @@
 
   function loop() {
 
+    creaturePool.forEach(function senseOtherCreatures(each) {
+      creatureSenses(each);
+    });
+
     creaturePool.forEach(function moveCreatures(each) {
       moveCreature(each);
     });
 
     creatureCollide();
 
-    creaturePool.forEach(function senseOtherCreatures(each) {
-      creatureSenses(each);
-    });
-
     round++;
 
     creaturePool.forEach(function (each) {
       oldAge(each);
     });
+
+    console.log('creatureSpeed: ', creaturePool[0].speed, 'top: ', creaturePool[0].htmlElement.getBoundingClientRect().top, 'left: ', creaturePool[0].htmlElement.getBoundingClientRect().left);
 
     $('.creature')
       .css({'transition': 'all 0.5s ease-out'});

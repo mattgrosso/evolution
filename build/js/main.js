@@ -310,9 +310,9 @@
     });
 
     creature.direction = sensorChoice(creature, sensedCreatures);
-    $('#' + creature.ID + ' .arrow').css({
-      'transform': 'rotate(' + creature.direction + 'deg)'
-    });
+    // $('#' + creature.ID + ' .arrow').css({
+    //   'transform': 'rotate(' + creature.direction + 'deg)'
+    // });
 
   }
 
@@ -340,7 +340,7 @@
     if (biggestLove.size > 0) {
       return findAngleTowards(creature, biggestLove);
     } else if (biggestEnemy.size > 0) {
-      return findAngleTowards(creature, biggestEnemy);
+      return findAngleTowards(creature, biggestEnemy) - 180;
     } else if (biggestFood.size > 0) {
       return findAngleTowards(creature, biggestFood);
     } else {

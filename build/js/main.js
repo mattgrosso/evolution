@@ -95,7 +95,7 @@
   }
 
   function drawCreature(creature) {
-    var randomTop = Math.floor((Math.random()*window.innerHeight)) + 50;
+    var randomTop = Math.floor((Math.random()*window.innerHeight)) + 75;
     var randomLeft = Math.floor((Math.random()*window.innerWidth));
     var newCreature = $('<div>').addClass('creature').attr('id', creature.ID)
       .css({
@@ -118,10 +118,11 @@
     //     'transform-origin': 'bottom'
     //   });
     // var text = $('<p>')
+    //   .text(creature.ID)
     //   .css({
     //     'position': 'relative',
-    //     'top': '-63px',
-    //     'left': '-3px'
+    //     'top': '0px',
+    //     'left': '-40px'
     //   });
     //
     // newCreature.append(newArrow);
@@ -150,7 +151,7 @@
     var leftChange = (creature.speed * Math.sin(direction * Math.PI/180));
     var topChange = (creature.speed * Math.cos(direction * Math.PI/180)) * -1;
 
-    if (oldCenterLeft + leftChange > window.innerWidth) {
+    if (oldCenterLeft + leftChange > window.innerWidth - 50) {
       $('#' + creature.ID)
         .css({
           'transition': 'none',
@@ -164,11 +165,11 @@
         });
     }
 
-    if (oldCenterTop + topChange > window.innerHeight) {
+    if (oldCenterTop + topChange > window.innerHeight - 100) {
       $('#' + creature.ID)
         .css({
           'transition': 'none',
-          'top': oldCenterTop + topChange - window.innerHeight
+          'top': oldCenterTop + topChange - window.innerHeight + 75
         });
     }
     else {
@@ -337,16 +338,12 @@
     });
 
     if (biggestLove.size > 0) {
-      $('#' + creature.ID + ' p').text('love' + Math.floor(creature.direction));
       return findAngleTowards(creature, biggestLove);
     } else if (biggestEnemy.size > 0) {
-      $('#' + creature.ID + ' p').text('fear');
       return findAngleTowards(creature, biggestEnemy);
     } else if (biggestFood.size > 0) {
-      $('#' + creature.ID + ' p').text('hunger');
       return findAngleTowards(creature, biggestFood);
     } else {
-      $('#' + creature.ID + ' p').text('wandering');
       return Math.floor(Math.random()*360);
     }
   }
@@ -387,19 +384,17 @@
     }
   }
 
-  $('.inputsForm').on('submit', function runLoop(event) {
-    event.preventDefault();
+  function startLoopOver() {
 
     $('.ecosystem').html('');
     round = 0;
     creaturePool = [];
-    console.log($('#seedNumber')[0].value);
-    seedNumber = $('#seedNumber')[0].value;
-    overPopulation = $('#maxPopulation')[0].value;
+    seedNumber = $('#seedNumber')[0].value || 10;
+    overPopulation = $('#maxPopulation')[0].value || 50;
 
     seedCreatures(seedNumber);
     looper = setInterval(loop, 200);
-  });
+  }
 
   function loop() {
 
@@ -424,16 +419,42 @@
 
     if (creaturePool.length < 1) {
       clearInterval(looper);
-      console.log('Everyone is Dead. You made it ' + round + ' rounds.');
+      $('.message').text('Everyone is Dead. You made it ' + round + ' rounds.');
     }
 
     if (creaturePool.length > overPopulation) {
       clearInterval(looper);
-      console.log('Overpopulation. You made it ' + round + ' rounds.');
+      $('.message').text('Overpopulation. You made it ' + round + ' rounds.');
     }
   }
 
+  $('.startLoopOver').on('click', function () {
+    $('.message').text('Loop reset with ' + seedNumber + ' to start and maxpop set to ' + overPopulation);
+    startLoopOver();
+  });
+
+  $('.inputsForm').on('submit', function (event) {
+    event.preventDefault();
+    $('.message').text('Loop reset with ' + seedNumber + ' to start and maxpop set to ' + overPopulation);
+    startLoopOver();
+  });
+
+  $('.manualSeed').on('click', function () {
+    $('.ecosystem').html('');
+    round = 0;
+    creaturePool = [];
+    seedNumber = $('#seedNumber')[0].value || 10;
+    overPopulation = $('#maxPopulation')[0].value || 50;
+    seedCreatures(seedNumber);
+    $('.message').text('Reseeded with ' + seedNumber + ' to start and maxpop set to ' + overPopulation);
+  });
+
+  $('.stopLoop').on('click', function () {
+    clearInterval(looper);
+  });
+
   $('.step-button').on('click', function () {
+    $('.message').text('Loop started with ' + seedNumber + ' to start and maxpop set to ' + overPopulation);
     loop();
   });
 

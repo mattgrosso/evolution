@@ -1,5 +1,6 @@
 body{
   width: 100%;
+  overflow: hidden;
 }
 
 .ecosystem{
@@ -13,6 +14,43 @@ body{
   background-color: blue !important;
 }
 
-/*.creature{
-  background-color: black;
-}*/
+.inputsForm{
+  margin: auto;
+  padding: 15px 20px 15px 20px;
+  width: 450px;
+  background-color: #53C361;
+  border: 3px solid black;
+  float: left;
+}
+
+.form-group{
+  margin: 10px;
+}
+
+button{
+  margin: auto;
+  width: 100px;
+  display: block;
+}
+
+.control-buttons{
+  float: left;
+  padding: 25px 50px;
+  clear: right;
+}
+
+.control-buttons button{
+  margin: 10px;
+  margin-left: 40px;
+  float: left;
+}
+
+.control-buttons p{
+  clear: both;
+  margin-top: 50px;
+  background-color: white;
+}
+
+.creature{
+  z-index: -1;
+}

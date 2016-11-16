@@ -13,15 +13,17 @@
 
     var randomMom = {
       sex: 'female',
-      size: Math.floor(Math.random()*10)+20,
-      speed: Math.floor(Math.random()*10)+20,
-      sensors: Math.floor(Math.random()*200)+200
+      size: Math.floor(Math.random()*10)+50,
+      speed: Math.floor(Math.random()*10)+40,
+      sensors: Math.floor(Math.random()*200)+200,
+      energy: Math.ceil(Math.random()*50)
     };
     var randomDad = {
       sex: 'male',
-      size: Math.floor(Math.random()*10)+20,
-      speed: Math.floor(Math.random()*10)+20,
-      sensors: Math.floor(Math.random()*200)+200
+      size: Math.floor(Math.random()*10)+50,
+      speed: Math.floor(Math.random()*10)+40,
+      sensors: Math.floor(Math.random()*200)+200,
+      energy: Math.ceil(Math.random()*50)
     };
 
     createCreature(randomMom, randomDad);
@@ -46,13 +48,18 @@
     var randomSpeed = Math.floor(Math.random()*11)-5;
     var randomSize = Math.floor(Math.random()*11)-5;
     var randomSensors = Math.floor(Math.random()*200)-100;
+    var momEnergyContrib = mom.energy * (Math.ceil(Math.random()*40)+10)/100;
+    var dadEnergyContrib = dad.energy * (Math.ceil(Math.random()*40)+10)/100;
     var babyCreature = {};
 
     babyCreature.ID = generateUIDNotMoreThan1million();
 
     babyCreature.birthday = round;
 
-    babyCreature.energy = Math.ceil(Math.random()*50);
+    babyCreature.energy = momEnergyContrib + dadEnergyContrib;
+    mom.energy = mom.energy - momEnergyContrib;
+    dad.energy = dad.energy - dadEnergyContrib;
+
 
     babyCreature.age = function age() {
       return round - babyCreature.birthday;
@@ -62,20 +69,23 @@
 
     if (randomSex % 2 === 0) {
       babyCreature.sex = 'female';
-    } else {
+    }
+    else {
       babyCreature.sex = 'male';
     }
 
     if (((mom.speed + dad.speed)/2 + randomSpeed) > 0) {
       babyCreature.speed = (mom.speed + dad.speed)/2 + randomSpeed;
-    } else {
+    }
+    else {
       babyCreature.stillBorn = true;
       babyCreature.speed = 0;
     }
 
     if (((mom.size + dad.size)/2 + randomSize) > 0) {
       babyCreature.size = (mom.size + dad.size)/2 + randomSize;
-    } else {
+    }
+    else {
       babyCreature.tooSmall = true;
       babyCreature.size = 0;
     }
@@ -151,7 +161,6 @@
     var topChange = (creature.speed * Math.cos(direction * Math.PI/180)) * -1;
 
     if (oldCenterLeft + leftChange > window.innerWidth - 50) {
-      console.log('too far right');
       $('#' + creature.ID)
         .css({
           'transition': 'none',
@@ -159,7 +168,6 @@
         });
     }
     else {
-      console.log('normal left');
       $('#' + creature.ID)
         .css({
           'left': (oldCenterLeft - creature.size/2) + leftChange,
@@ -167,7 +175,6 @@
     }
 
     if (oldCenterTop + topChange > window.innerHeight - 100) {
-      console.log('too far down');
       $('#' + creature.ID)
         .css({
           'transition': 'none',
@@ -175,7 +182,6 @@
         });
     }
     else {
-      console.log('normal top');
       $('#' + creature.ID)
         .css({
           'top':( oldCenterTop - creature.size/2) + topChange,
@@ -369,7 +375,9 @@
 
   function creatureInteractions(creature1, creature2) {
     if (creature1.sex !== creature2.sex) {
-      createCreature(creature1, creature2);
+      if (Math.ceil(Math.random()*10) % 2 < 1 ) {
+        createCreature(creature1, creature2);
+      }
     } else if (creature1.size > creature2.size) {
       creature1.energy = creature1.energy + creature2.energy;
       killCreature(creature2);
@@ -415,8 +423,6 @@
     creaturePool.forEach(function (each) {
       oldAge(each);
     });
-
-    console.log('creatureSpeed: ', creaturePool[0].speed, 'top: ', creaturePool[0].htmlElement.getBoundingClientRect().top, 'left: ', creaturePool[0].htmlElement.getBoundingClientRect().left);
 
     $('.creature')
       .css({'transition': 'all 0.5s ease-out'});

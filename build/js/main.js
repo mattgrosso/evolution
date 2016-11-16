@@ -154,38 +154,40 @@
   }
 
   function moveCreature(creature) {
-    var direction = creature.direction;
-    var oldCenterLeft = parseInt(creature.htmlElement.style.left) + creature.size/2;
-    var oldCenterTop = parseInt(creature.htmlElement.style.top) + creature.size/2;
-    var leftChange = (creature.speed * Math.sin(direction * Math.PI/180));
-    var topChange = (creature.speed * Math.cos(direction * Math.PI/180)) * -1;
+    if (creature.speed) {
+      var direction = creature.direction;
+      var oldCenterLeft = parseInt(creature.htmlElement.style.left) + creature.size/2;
+      var oldCenterTop = parseInt(creature.htmlElement.style.top) + creature.size/2;
+      var leftChange = (creature.speed * Math.sin(direction * Math.PI/180));
+      var topChange = (creature.speed * Math.cos(direction * Math.PI/180)) * -1;
 
-    if (oldCenterLeft + leftChange > window.innerWidth - 50) {
-      $('#' + creature.ID)
-        .css({
-          'transition': 'none',
-          'left': (oldCenterLeft - creature.size/2) + leftChange - window.innerWidth
-        });
-    }
-    else {
-      $('#' + creature.ID)
-        .css({
-          'left': (oldCenterLeft - creature.size/2) + leftChange,
-        });
-    }
+      if (oldCenterLeft + leftChange > window.innerWidth - 50) {
+        $('#' + creature.ID)
+          .css({
+            'transition': 'none',
+            'left': (oldCenterLeft - creature.size/2) + leftChange - window.innerWidth
+          });
+      }
+      else {
+        $('#' + creature.ID)
+          .css({
+            'left': (oldCenterLeft - creature.size/2) + leftChange,
+          });
+      }
 
-    if (oldCenterTop + topChange > window.innerHeight - 100) {
-      $('#' + creature.ID)
-        .css({
-          'transition': 'none',
-          'top':( oldCenterTop - creature.size/2) + topChange - window.innerHeight + 75
-        });
-    }
-    else {
-      $('#' + creature.ID)
-        .css({
-          'top':( oldCenterTop - creature.size/2) + topChange,
-        });
+      if (oldCenterTop + topChange > window.innerHeight - 100) {
+        $('#' + creature.ID)
+          .css({
+            'transition': 'none',
+            'top':( oldCenterTop - creature.size/2) + topChange - window.innerHeight + 75
+          });
+      }
+      else {
+        $('#' + creature.ID)
+          .css({
+            'top':( oldCenterTop - creature.size/2) + topChange,
+          });
+      }
     }
 
   }
@@ -387,6 +389,35 @@
     }
   }
 
+  function addFood() {
+    var foodSize = Math.ceil(Math.random()*90)+10;
+    var randomTop = Math.floor((Math.random()*window.innerHeight)) + 75;
+    var randomLeft = Math.floor((Math.random()*window.innerWidth));
+    var randomID = generateUIDNotMoreThan1million();
+    var newFood = {
+      ID: randomID,
+      food: true,
+      energy: foodSize
+    };
+
+
+    creaturePool.push(newFood);
+
+    var newFoodDiv = $('<div>')
+      .addClass('food')
+      .css({
+        'position': 'absolute',
+        'width': foodSize,
+        'height': foodSize,
+        'top': randomTop,
+        'left': randomLeft,
+        'border-radius': foodSize/2,
+        'background-color': 'blue'
+      });
+    $('.ecosystem')
+      .append(newFoodDiv);
+  }
+
   function oldAge(creature) {
     creature.energy = creature.energy - 1;
     if (creature.energy < 1) {
@@ -395,6 +426,7 @@
   }
 
   function startLoopOver() {
+    clearInterval(looper);
 
     $('.ecosystem').html('');
     round = 0;
@@ -403,7 +435,9 @@
     overPopulation = $('#maxPopulation')[0].value || 50;
 
     seedCreatures(seedNumber);
+
     looper = setInterval(loop, 200);
+    console.log(looper);
   }
 
   function loop() {
@@ -468,4 +502,21 @@
     loop();
   });
 
+  $('.addFood').on('click', function () {
+    addFood();
+  });
+
+  $('.clearFood').on('click', function () {
+    var filteredArray = creaturePool.filter(function removeFoods(each) {
+      return !each.food;
+    });
+    console.log(filteredArray);
+
+    // creaturePool.forEach(function removeFoods(each) {
+    //   creaturePool.splice(each, 1);
+    //   console.log(creaturePool);
+    // });
+    // console.log(creaturePool);
+    $('.food').remove();
+  });
 })();

@@ -56,3 +56,15 @@ button{
 .creature{
   z-index: -1;
 }
+
+.githubLink{
+  position: absolute;
+  right: 0;
+  bottom: 7px;
+}
+
+.githubLink img{
+  width: 25px;
+  height: 25px;
+  padding: 0px 10px;
+}

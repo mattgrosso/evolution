@@ -95,8 +95,8 @@
   }
 
   function drawCreature(creature) {
-    var randomTop = Math.floor((Math.random()*350)) + 50;
-    var randomLeft = Math.floor((Math.random()*650)) + 50;
+    var randomTop = Math.floor((Math.random()*window.innerHeight)) + 50;
+    var randomLeft = Math.floor((Math.random()*window.innerWidth));
     var newCreature = $('<div>').addClass('creature').attr('id', creature.ID)
       .css({
         'width': creature.size,
@@ -150,10 +150,33 @@
     var leftChange = (creature.speed * Math.sin(direction * Math.PI/180));
     var topChange = (creature.speed * Math.cos(direction * Math.PI/180)) * -1;
 
-    $('#' + creature.ID).css({
-                          'left': oldCenterLeft + leftChange,
-                          'top': oldCenterTop + topChange
-                        });
+    if (oldCenterLeft + leftChange > window.innerWidth) {
+      $('#' + creature.ID)
+        .css({
+          'transition': 'none',
+          'left': oldCenterLeft + leftChange - window.innerWidth
+        });
+    }
+    else {
+      $('#' + creature.ID)
+        .css({
+          'left': oldCenterLeft + leftChange,
+        });
+    }
+
+    if (oldCenterTop + topChange > window.innerHeight) {
+      $('#' + creature.ID)
+        .css({
+          'transition': 'none',
+          'top': oldCenterTop + topChange - window.innerHeight
+        });
+    }
+    else {
+      $('#' + creature.ID)
+        .css({
+          'top': oldCenterTop + topChange,
+        });
+    }
 
   }
 
@@ -395,6 +418,9 @@
     creaturePool.forEach(function (each) {
       oldAge(each);
     });
+
+    $('.creature')
+      .css({'transition': 'all 0.5s ease-out'});
 
     if (creaturePool.length < 1) {
       clearInterval(looper);

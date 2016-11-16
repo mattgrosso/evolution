@@ -5,9 +5,8 @@ body{
 .ecosystem{
   box-sizing: border-box;
   position: relative;
-  width: 750px;
-  height: 500px;
-  border: 1px solid black;
+  width: 100%;
+  height: 100%;
 }
 
 .special{

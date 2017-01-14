@@ -11,6 +11,9 @@
   },
   "author": "Matt Grosso",
   "license": "ISC",
+  "engines": {
+    "node": "7.2.0"
+  },
   "dependencies": {
     "express": "^4.10.2",
     "harp": "^0.20.3"

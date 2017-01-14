@@ -8,35 +8,44 @@
   </head>
   <body>
 
-    <form class="inputsForm">
-
-      <div class="form-group">
-        <label for="seedNumber">Starting Quantity</label>
-        <input id="seedNumber" class="inputValue" type="text" value="">
-      </div>
-
-      <div class="form-group">
-        <label for="maxPopulation">Overpopulation Quantity (stops simulation)</label>
-        <input id="maxPopulation" class="inputValue" type="text" value="">
-      </div>
-
-      <button type="submit">Submit and Run</button>
-    </form>
-
-    <div class="control-buttons">
-      <button class="startLoopOver" type="button" name="button">Restart Loop</button>
-      <!-- <button class="manualSeed" type="button" name="button">Manual Seed</button> -->
-      <!-- <button class="step-button" type="button" name="button">Step</button> -->
-      <button class="stopLoop" type="button" name="button">Stop Loop</button>
-      <button class="addFood" type="button" name="button">Add Food</button>
-      <button class="clearFood" type="button" name="button">Clear Food</button>
-
-      <p class="message">This is just a sample message so I can style the css</p>
-
+    <div class="start-button-popup">
+      <button class="start-button" type="button" name="button">Let There Be Life</button>
+      <p class="message"></p>
     </div>
 
+    <div class="page-wrapper">
 
-    <div class="ecosystem"></div>
+      <form class="inputsForm">
+
+        <div class="form-group">
+          <label for="seedNumber">Starting Quantity</label>
+          <input id="seedNumber" class="inputValue" type="text" value="">
+        </div>
+
+        <div class="form-group">
+          <label for="maxPopulation">Overpopulation Quantity (stops simulation)</label>
+          <input id="maxPopulation" class="inputValue" type="text" value="">
+        </div>
+
+        <button type="submit">Submit and Run</button>
+      </form>
+
+      <div class="control-buttons">
+        <button class="startLoopOver" type="button" name="button">Restart Loop</button>
+        <!-- <button class="manualSeed" type="button" name="button">Manual Seed</button> -->
+        <!-- <button class="step-button" type="button" name="button">Step</button> -->
+        <button class="stopLoop" type="button" name="button">Stop Loop</button>
+        <button class="addFood" type="button" name="button">Add Food</button>
+        <button class="clearFood" type="button" name="button">Clear Food</button>
+
+        <p class="message"></p>
+
+      </div>
+
+
+      <div class="ecosystem"></div>
+
+    </div>
 
     <a class="githubLink" href="https://github.com/mattgrosso/evolution" target="_blank"><img src="/imgs/search.png" alt="Github logo" /></a>
     <!-- <canvas id="canvas" width="500" height="500"></canvas> -->

@@ -463,6 +463,9 @@
 
     if (creaturePool.length < 1) {
       clearInterval(looper);
+      $('.start-button-popup').css({
+        'display': 'block'
+      });
       $('.message').text('Everyone is Dead. You made it ' + round + ' rounds.');
     }
 
@@ -471,6 +474,16 @@
       $('.message').text('Overpopulation. You made it ' + round + ' rounds.');
     }
   }
+
+  $('.start-button').on('click', function startSimulation() {
+    $('.start-button-popup').css({
+      'display': 'none'
+    });
+    $('.page-wrapper').css({
+      'display': 'block'
+    });
+    startLoopOver();
+  });
 
   $('.startLoopOver').on('click', function () {
     $('.message').text('Loop reset with ' + seedNumber + ' to start and maxpop set to ' + overPopulation);

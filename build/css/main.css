@@ -3,6 +3,35 @@ body{
   overflow: hidden;
 }
 
+.start-button-popup{
+  z-index: 2;
+  position: absolute;
+  top: 30%;
+  left: 30%;
+  width: 40%;
+  padding: 25px;
+  background-color: #53C361;
+  border: 3px solid black;
+}
+
+.start-button{
+  position: relative;
+  top: 27%;
+  width: auto;
+  padding: 15px 31px;
+  font-size: 1.3em;
+}
+
+.start-button-popup > p{
+  position: relative;
+  top: 27%;
+  text-align: center;
+}
+
+.page-wrapper{
+  display: none;
+}
+
 .ecosystem{
   box-sizing: border-box;
   position: relative;
